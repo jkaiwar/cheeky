@@ -1,13 +1,103 @@
 <!DOCTYPE html>
+
 <html>
   <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&amp;display=swap" rel="stylesheet">
+    <style>
+    /* CSS */
+    .button-52 {
+      font-size: 16px;
+      font-weight: 200;
+      letter-spacing: 1px;
+      padding: 13px 20px 13px;
+      outline: 0;
+      border: 1px solid black;
+      cursor: pointer;
+      position: relative;
+      background-color: rgba(0, 0, 0, 0);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .button-52:after {
+      content: "";
+      background-color: #1eff00;
+      width: 100%;
+      z-index: -1;
+      position: absolute;
+      height: 100%;
+      top: 7px;
+      left: 7px;
+      transition: 0.2s;
+    }
+
+    .button-52:hover:after {
+      top: 0px;
+      left: 0px;
+      background-color: #ff0000;
+    }
+
+    @media (min-width: 768px) {
+      .button-52 {
+        padding: 13px 50px 13px;
+      }
+    }
+    </style>
   </head>
-  <body style="background-color:{{.Color}}">
+  <body style="background-color:{{.Color}};text-align: center;font-family: {{.Font}}">
+    <img src="{{.Url}}" style="width: 30%;margin-bottom: {{.ImgMargin}}; margin-top: {{.ImgMargin}}">
     <h1>{{.Title}}</h1>
     <p>{{.Instructions}}</p>
+    
     <form action="/flip" method="post" id="dms">
-      <button name="dms" value="">Deadman Switch</button>
+      <button class="button-52" name="dms" value="">Deadman Switch</button>
     </form>
+
+    <div class="container">
+
+      <div >
+        <p id="countdown">
+         
+        </p>
+      </div>
+    
+    </div>
+
+    <script>
+      
+      var countDownDate = new Date("{{.Time}}").getTime();
+      countDownDate = new Date(countDownDate + 5*60000);
+      var x = setInterval(function() {
+        if("{{.Time}}" !== "0"){
+
+        // Get today's date and time
+        var now = new Date().getTime();
+
+
+        // Find the distance between now and the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        document.getElementById("countdown").innerHTML = minutes + "m " + seconds + "s ";
+        document.getElementById("countdown").style = "border: solid; margin-left: 40%; margin-right: 40%;";
+        
+
+        // If the count down is finished, write some text
+        if (distance < 0) {
+          clearInterval(x);
+          document.getElementById("countdown").innerHTML = "EXPIRED";
+        }
+        }
+      }, 1000);
+    </script>
+
   </body>
 </html>
