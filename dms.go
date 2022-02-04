@@ -18,9 +18,10 @@ func init() {
 }
 
 func main() {
-	PORT := ":8083"
+	PORT := ":8081"
 	http.HandleFunc("/", index)
 	http.HandleFunc("/flip", flop)
+	http.HandleFunc("/api", okcharles)
 	log.Fatal(http.ListenAndServe(PORT, nil))
 }
 
@@ -68,4 +69,13 @@ func flop(w http.ResponseWriter, r *http.Request) {
 	}
 	time.AfterFunc(dur, f)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func okcharles(w http.ResponseWriter, r *http.Request) {
+	if kstate == 0 {
+		w.Write([]byte("novid: false"))
+	}
+	if kstate == 1 {
+		w.Write([]byte("novid: true"))
+	}
 }
