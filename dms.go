@@ -13,6 +13,10 @@ var tmpl *template.Template
 
 var kstate int = 0
 
+var timestr string = "0"
+
+var timestrcounter int = 0
+
 func init() {
 	tmpl = template.Must(template.ParseFiles("g.html"))
 }
@@ -52,7 +56,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		d.Url = "https://i.pinimg.com/originals/13/3d/b4/133db4f9d60cfb7f52c00f8bec546149.png"
 		d.ImgMargin = "-14%"
 		d.Font = "Comic Neue"
-		d.Time = time.Now().Format("01-02-2006 15:04:05")
+		d.Time = timestr
 	}
 	tmpl.ExecuteTemplate(w, "g.html", d)
 }
@@ -63,9 +67,14 @@ func flop(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	kstate = 1
+	timestr = time.Now().Format("01-02-2006 15:04:05")
+	timestrcounter = timestrcounter + 1
 	dur := time.Duration(5) * time.Minute
 	f := func() {
-		kstate = 0
+		timestrcounter = timestrcounter - 1
+		if timestrcounter == 0 {
+			kstate = 0
+		}
 	}
 	time.AfterFunc(dur, f)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
