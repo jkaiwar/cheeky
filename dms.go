@@ -9,21 +9,28 @@ import (
 
 var tmpl *template.Template
 var timestr string = ""
-var timestrcounter int = 0
+var t *time.Timer
 
 func init() {
 	tmpl = template.Must(template.ParseFiles("index.gohtml"))
+	t = time.NewTimer((0) * time.Second)
 }
 
 func main() {
 	PORT := ":8081"
-	http.HandleFunc("/", index)
-	http.HandleFunc("/flip", flop)
-	http.HandleFunc("/api", okcharles)
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/flip", flipHandler)
+	http.HandleFunc("/api", apiHandler)
+	go func() {
+		for {
+			<-t.C
+			timestr = ""
+		}
+	}()
 	log.Fatal(http.ListenAndServe(PORT, nil))
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, r *http.Request) {
 	d := struct {
 		Title        string
 		Color        string
@@ -54,22 +61,14 @@ func index(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "index.gohtml", d)
 }
 
-func fire() {
-	timestrcounter = timestrcounter - 1
-	if timestrcounter == 0 {
-		timestr = ""
-	}
-}
-
-func flop(w http.ResponseWriter, r *http.Request) {
+func flipHandler(w http.ResponseWriter, r *http.Request) {
 	timestr = time.Now().Format("01-02-2006 15:04:05")
-	timestrcounter = timestrcounter + 1
-	dur := time.Duration(10) * time.Second
-	time.AfterFunc(dur, fire)
+	dur := time.Duration(5) * time.Minute
+	t.Reset(dur)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func okcharles(w http.ResponseWriter, r *http.Request) {
+func apiHandler(w http.ResponseWriter, r *http.Request) {
 	if timestr == "" {
 		w.Write([]byte("novid: false"))
 	} else {
